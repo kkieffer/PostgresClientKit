@@ -21,14 +21,15 @@ import Foundation
 
 internal class StartupRequest: Request {
     
-    internal init(user: String, database: String) {
+    internal init(user: String, database: String, appName: String) {
         self.user = user
         self.database = database
+        self.appName = appName
     }
     
     private let user: String
     private let database: String
-    
+    private let appName : String
     
     //
     // MARK: Request
@@ -47,6 +48,9 @@ internal class StartupRequest: Request {
         
         body.append("database".dataZero)
         body.append(database.dataZero)
+        
+        body.append("application_name".dataZero)
+        body.append(appName.dataZero)
         
         for parameter in Parameter.values {
             if parameter.isSetWhenConnecting {

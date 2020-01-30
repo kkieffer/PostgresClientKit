@@ -60,6 +60,9 @@ public struct ConnectionConfiguration {
     /// The credential to use to authenticate to the Postgres server.  Defaults to
     /// `Credential.trust`.
     public var credential: Credential = .trust
+    
+    /// The application that is connnecting.  Defaults to ""PostgresClientKit"
+    public var appName: String = "PostgresClientKit"
 }
 
 // EOF

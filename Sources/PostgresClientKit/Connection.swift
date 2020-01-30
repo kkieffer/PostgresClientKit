@@ -151,10 +151,11 @@ public class Connection: CustomStringConvertible {
         
         let user = configuration.user
         let database = configuration.database
+        let appName = configuration.appName
         
         log(.fine, "Connecting to database \(database) as user \(user)")
         
-        let startupRequest = StartupRequest(user: user, database: database)
+        let startupRequest = StartupRequest(user: user, database: database, appName: appName)
         try sendRequest(startupRequest)
         
         var credentialSent = false
