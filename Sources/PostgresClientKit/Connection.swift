@@ -95,6 +95,7 @@ public class Connection: CustomStringConvertible {
         
         do {
             socket = try Socket.create()
+            socket.readBufferSize = 65536
             log(.finer, "Created socket")
         } catch {
             Postgres.logger.severe("Unable to create socket: \(error)")
