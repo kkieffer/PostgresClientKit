@@ -96,7 +96,6 @@ public class Connection: CustomStringConvertible {
         do {
             socket = try Socket.create()
             socket.readBufferSize = 65536
-            try socket.setNoDelay()
             log(.finer, "Created socket")
         } catch {
             Postgres.logger.severe("Unable to create socket: \(error)")
@@ -1227,25 +1226,3 @@ public class Connection: CustomStringConvertible {
 
 
 
-extension Socket {
-    
-    func setNoDelay() throws {
-       
-        var one: Int32 = 1
-        if setsockopt(self.socketfd, IPPROTO_TCP, TCP_NODELAY, &one, socklen_t(MemoryLayout<Int32>.size)) < 0 {
-
-            let lastError = String(validatingUTF8: strerror(errno)) ?? "Error: \(errno)"
-            throw PostgresError.socketError(cause: CustomSocketError(errString: lastError))
-
-        }
-    }
-
-}
-
-public struct CustomSocketError: Swift.Error, CustomStringConvertible {
-    
-    let errString : String
-    public var description: String {
-        return errString
-    }
-}
