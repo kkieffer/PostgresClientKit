@@ -75,7 +75,8 @@ of the connection.</p>
 
 <ul>
 <li>Call <code><a href="Classes/Connection.html#/s:17PostgresClientKit10ConnectionC16prepareStatement4textAA0F0CSS_tKF">Connection.prepareStatement(text:)</a></code> to parse the SQL text and return a <code><a href="Classes/Statement.html">Statement</a></code>.</li>
-<li>Call <code><a href="Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValuesAA6CursorCSayAA0A16ValueConvertible_pSgG_tKF">Statement.execute(parameterValues:)</a></code> to execute the statement and return a <code><a href="Classes/Cursor.html">Cursor</a></code>.</li>
+<li>Call <code><a href="Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValues22retrieveColumnMetadataAA6CursorCSayAA0A16ValueConvertible_pSgG_SbtKF">Statement.execute(parameterValues:retrieveColumnMetadata:)</a></code> to execute the statement
+and return a <code><a href="Classes/Cursor.html">Cursor</a></code>.</li>
 <li>Iterate over the <code><a href="Classes/Cursor.html">Cursor</a></code> to retrieve the rows in the result.</li>
 <li>Close the <code><a href="Classes/Cursor.html">Cursor</a></code> and the <code><a href="Classes/Statement.html">Statement</a></code> to release resources on the Postgres server.</li>
 </ul>
@@ -85,8 +86,8 @@ each time.  This is more efficient than having the Postgres server repeatedly pa
 SQL text.</p>
 
 <p>A <code>Connection</code> performs no more than one SQL statement at a time.  When
-<code><a href="Classes/Connection.html#/s:17PostgresClientKit10ConnectionC16prepareStatement4textAA0F0CSS_tKF">Connection.prepareStatement(text:)</a></code> or <code><a href="Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValuesAA6CursorCSayAA0A16ValueConvertible_pSgG_tKF">Statement.execute(parameterValues:)</a></code> is called, any
-previous <code><a href="Classes/Cursor.html">Cursor</a></code> for the <code>Connection</code> is closed.</p>
+<code><a href="Classes/Connection.html#/s:17PostgresClientKit10ConnectionC16prepareStatement4textAA0F0CSS_tKF">Connection.prepareStatement(text:)</a></code> or <code><a href="Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValues22retrieveColumnMetadataAA6CursorCSayAA0A16ValueConvertible_pSgG_SbtKF">Statement.execute(parameterValues:retrieveColumnMetadata:)</a></code>
+is called, any previous <code><a href="Classes/Cursor.html">Cursor</a></code> for the <code>Connection</code> is closed.</p>
 
 <p>The following methods also close any previous <code><a href="Classes/Cursor.html">Cursor</a></code> for the <code>Connection</code>:</p>
 
@@ -137,10 +138,6 @@ the network socket).  Use <code><a href="Classes/Connection.html#/s:17PostgresCl
                       </section>
                     </div>
                   </li>
-                </ul>
-              </div>
-              <div class="task-group">
-                <ul>
                   <li class="item">
                     <div>
                       <code>
@@ -203,10 +200,6 @@ constraints described by the API documentation for <code><a href="Classes/Connec
                       </section>
                     </div>
                   </li>
-                </ul>
-              </div>
-              <div class="task-group">
-                <ul>
                   <li class="item">
                     <div>
                       <code>
@@ -223,7 +216,7 @@ constraints described by the API documentation for <code><a href="Classes/Connec
                           <p>The result of successfully executing a <code><a href="Classes/Statement.html">Statement</a></code>.</p>
 <div class="aside aside-note">
     <p class="aside-title">Note</p>
-    Do not confuse this <code>Cursor</code> class with the SQL cursors created by the <a href="https://www.postgresql.org/docs/11/sql-declare.html">SQL DECLARE
+    Do not confuse this <code>Cursor</code> class with the SQL cursors created by the <a href="https://www.postgresql.org/docs/12/sql-declare.html">SQL DECLARE
 command</a>.  The <code>Cursor</code> class exposes
 the result of executing a <em>single</em> SQL command.  A SQL cursor, on other other hand, exposes
 a query&rsquo;s result by <em>repeated</em> execution of the SQL <code>FETCH</code> command.
@@ -239,7 +232,7 @@ automatically closed by its deinitializer.</p>
 Postgres server.</p>
 <div class="aside aside-see-also">
     <p class="aside-title">See also</p>
-    <a href="https://www.postgresql.org/docs/11/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY">Postgres: Message Flow - Extended
+    <a href="https://www.postgresql.org/docs/12/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY">Postgres: Message Flow - Extended
 Query</a>
 
 </div>
@@ -257,10 +250,6 @@ Query</a>
                       </section>
                     </div>
                   </li>
-                </ul>
-              </div>
-              <div class="task-group">
-                <ul>
                   <li class="item">
                     <div>
                       <code>
@@ -289,10 +278,6 @@ Query</a>
                       </section>
                     </div>
                   </li>
-                </ul>
-              </div>
-              <div class="task-group">
-                <ul>
                   <li class="item">
                     <div>
                       <code>
@@ -355,10 +340,6 @@ the logger dispatches the record to the logger&rsquo;s current <code>handler</co
                       </section>
                     </div>
                   </li>
-                </ul>
-              </div>
-              <div class="task-group">
-                <ul>
                   <li class="item">
                     <div>
                       <code>
@@ -376,8 +357,8 @@ the logger dispatches the record to the logger&rsquo;s current <code>handler</co
 
 <p>Use <code><a href="Classes/Connection.html#/s:17PostgresClientKit10ConnectionC16prepareStatement4textAA0F0CSS_tKF">Connection.prepareStatement(text:)</a></code> to create a <code>Statement</code>.</p>
 
-<p>Call <code><a href="Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValuesAA6CursorCSayAA0A16ValueConvertible_pSgG_tKF">Statement.execute(parameterValues:)</a></code> to execute the <code>Statement</code>, specifying the values
-of any parameters.</p>
+<p>Call <code><a href="Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValues22retrieveColumnMetadataAA6CursorCSayAA0A16ValueConvertible_pSgG_SbtKF">Statement.execute(parameterValues:retrieveColumnMetadata:)</a></code> to execute the <code>Statement</code>,
+specifying the values of any parameters.</p>
 
 <p>A <code>Statement</code> can be repeatedly executed, and the values of its parameters can be different
 each time.</p>
@@ -491,6 +472,9 @@ whose name is the <code>id</code> of the <code>Statement</code>.</p>
               <a href="Structs.html">Structures</a>
               <ul class="nav-group-tasks">
                 <li class="nav-group-task">
+                  <a href="Structs/ColumnMetadata.html">ColumnMetadata</a>
+                </li>
+                <li class="nav-group-task">
                   <a href="Structs/ConnectionConfiguration.html">ConnectionConfiguration</a>
                 </li>
                 <li class="nav-group-task">
@@ -540,7 +524,7 @@ whose name is the <code>id</code> of the <code>Statement</code>.</p>
       <div class="footer-wrapper">
         <section id="footer">
           <p>Copyright 2019 David Pitfield and the PostgresClientKit contributors. Licensed under the Apache License, Version 2.0.</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </div>
     </div>

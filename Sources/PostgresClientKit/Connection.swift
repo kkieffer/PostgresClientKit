@@ -30,7 +30,8 @@ import SSLService
 /// Connections are used to perform SQL statements.  To perform a SQL statement:
 ///
 /// - Call `Connection.prepareStatement(text:)` to parse the SQL text and return a `Statement`.
-/// - Call `Statement.execute(parameterValues:)` to execute the statement and return a `Cursor`.
+/// - Call `Statement.execute(parameterValues:retrieveColumnMetadata:)` to execute the statement
+///   and return a `Cursor`.
 /// - Iterate over the `Cursor` to retrieve the rows in the result.
 /// - Close the `Cursor` and the `Statement` to release resources on the Postgres server.
 ///
@@ -39,8 +40,8 @@ import SSLService
 /// SQL text.
 ///
 /// A `Connection` performs no more than one SQL statement at a time.  When
-/// `Connection.prepareStatement(text:)` or `Statement.execute(parameterValues:)` is called, any
-/// previous `Cursor` for the `Connection` is closed.
+/// `Connection.prepareStatement(text:)` or `Statement.execute(parameterValues:retrieveColumnMetadata:)`
+/// is called, any previous `Cursor` for the `Connection` is closed.
 ///
 /// The following methods also close any previous `Cursor` for the `Connection`:
 ///
@@ -136,6 +137,11 @@ public class Connection: CustomStringConvertible {
                 throw PostgresError.sslNotSupported
             }
             
+            // The read buffer should be fully consumed at this point, so that the next byte read
+            // will have passed through SSL/TLS decryption.  If this is not the case, there must
+            // either be a server protocol error or a man-in-the-middle attack.
+            try verifyReadBufferFullyConsumed()
+            
             do {
                 let sslConfig = configuration.sslServiceConfiguration
                 let sslService = try SSLService(usingConfiguration: sslConfig)!
@@ -152,14 +158,18 @@ public class Connection: CustomStringConvertible {
         
         let user = configuration.user
         let database = configuration.database
-        let appName = configuration.appName
+        let applicationName = configuration.applicationName
         
         log(.fine, "Connecting to database \(database) as user \(user)")
         
-        let startupRequest = StartupRequest(user: user, database: database, appName: appName)
+        let startupRequest = StartupRequest(user: user,
+                                            database: database,
+                                            applicationName: applicationName)
+        
         try sendRequest(startupRequest)
         
-        var credentialSent = false
+        var authenticationRequestSent = false
+        var scramSHA256Authenticator: SCRAMSHA256Authenticator? = nil
         
         authentication:
         while true {
@@ -168,16 +178,6 @@ public class Connection: CustomStringConvertible {
             switch authenticationResponse {
                 
             case is AuthenticationOKResponse:
-                
-                if !credentialSent {
-                    guard case .trust = configuration.credential else {
-                        // Postgres allowed trust authentication, yet a cleartextPassword or
-                        // md5Password was supplied.  Throw to alert of a possible Postgres
-                        // misconfiguration.
-                        log(.warning, "Trust credential required to authenticate")
-                        throw PostgresError.trustCredentialRequired
-                    }
-                }
                 
                 break authentication
                 
@@ -190,7 +190,7 @@ public class Connection: CustomStringConvertible {
                 
                 let passwordMessageRequest = PasswordMessageRequest(password: password)
                 try sendRequest(passwordMessageRequest)
-                credentialSent = true
+                authenticationRequestSent = true
                 
             case let response as AuthenticationMD5PasswordResponse:
                 
@@ -199,30 +199,91 @@ public class Connection: CustomStringConvertible {
                     throw PostgresError.md5PasswordCredentialRequired
                 }
                 
-                func md5AsHex(data: Data) -> String {
-                    return Postgres.md5(data: data).map { String(format: "%02x", $0) }.joined()
-                }
-                
                 // Compute concat('md5', md5(concat(md5(concat(password, username)), random-salt))).
                 var passwordUser = password.data
                 passwordUser.append(user.data)
-                let passwordUserHash = md5AsHex(data: passwordUser)
+                let passwordUserHash = Crypto.md5(data: passwordUser).hexEncodedString()
                 
                 var salted = passwordUserHash.data
                 salted.append(response.salt.data)
-                let saltedHash = md5AsHex(data: salted)
+                let saltedHash = Crypto.md5(data: salted).hexEncodedString()
                 
                 let passwordMessageRequest = PasswordMessageRequest(password: "md5" + saltedHash)
                 try sendRequest(passwordMessageRequest)
-                credentialSent = true
+                authenticationRequestSent = true
 
+            case let response as AuthenticationSASLResponse:
+                
+                guard case let .scramSHA256(password) = configuration.credential else {
+                    log(.warning, "SCRAM-SHA-256 credential required to authenticate")
+                    throw PostgresError.scramSHA256CredentialRequired
+                }
+                
+                guard scramSHA256Authenticator == nil else {
+                    log(.warning, "Unexpected response type: \(response.responseType)")
+                    
+                    throw PostgresError.serverError(
+                        description: "unexpected response type '\(response.responseType)'")
+                }
+                
+                guard response.mechanisms.contains("SCRAM-SHA-256") else {
+                    throw PostgresError.unsupportedAuthenticationType(
+                        authenticationType: String(describing: response))
+                }
+                
+                scramSHA256Authenticator = SCRAMSHA256Authenticator(user: user, password: password)
+                let clientFirstMessage = try scramSHA256Authenticator!.prepareClientFirstMessage()
+                
+                let saslInitialRequest = SASLInitialRequest(
+                    mechanism: "SCRAM-SHA-256",
+                    clientFirstMessage: clientFirstMessage)
+                
+                try sendRequest(saslInitialRequest)
+                authenticationRequestSent = true
+                
+            case let response as AuthenticationSASLContinueResponse:
+                
+                guard scramSHA256Authenticator?.state == .sentClientFirstMessage else {
+                    log(.warning, "Unexpected response type: \(response.responseType)")
+                    
+                    throw PostgresError.serverError(
+                        description: "unexpected response type '\(response.responseType)'")
+                }
+                
+                try scramSHA256Authenticator!.processServerFirstMessage(response.serverFirstMessage)
+                let clientFinalMessage = try scramSHA256Authenticator!.prepareClientFinalMessage()
+                
+                let saslRequest = SASLRequest(clientFinalMessage: clientFinalMessage)
+                try sendRequest(saslRequest)
+                
+            case let response as AuthenticationSASLFinalResponse:
+                
+                guard scramSHA256Authenticator?.state == .sentClientFinalMessage else {
+                    log(.warning, "Unexpected response type: \(response.responseType)")
+                    
+                    throw PostgresError.serverError(
+                        description: "unexpected response type '\(response.responseType)'")
+                }
+                
+                try scramSHA256Authenticator!.processServerFinalMessage(response.serverFinalMessage)
+                
             default:
                 fatalError("\(authenticationResponse) not handled when connecting")
             }
         }
         
         try receiveResponse(type: ReadyForQueryResponse.self)
-        
+
+        if !authenticationRequestSent {
+            guard case .trust = configuration.credential else {
+                // Postgres allowed trust authentication, yet a cleartextPassword,
+                // md5Password, or scramSHA256 credential was supplied.  Throw to
+                // alert of a possible Postgres misconfiguration.
+                log(.warning, "Trust credential required to authenticate")
+                throw PostgresError.trustCredentialRequired
+            }
+        }
+
         log(.fine, "Successfully connected")
         success = true
     }
@@ -362,17 +423,22 @@ public class Connection: CustomStringConvertible {
         return statement
     }
     
-    /// Called by `Statement.execute(parameterValues:)` to execute a `Statement`.
+    /// Called by `Statement.execute(parameterValues:retrieveColumnMetadata:)` to execute a
+    /// `Statement`.
     ///
     /// Any previous `Cursor` for this `Connection` is closed.
     ///
     /// - Parameters:
     ///   - statement: the `Statement`
     ///   - parameterValues: the values of the statement's parameters
+    ///   - retrieveColumnMetadata: whether to retrieve metadata about the columns in the results
     /// - Returns: the `Cursor` containing the result
     /// - Throws: `PostgresError` is the operation fails
     internal func executeStatement(_ statement: Statement,
-                                   parameterValues: [PostgresValueConvertible?] = []) throws -> Cursor {
+                                   parameterValues: [PostgresValueConvertible?] = [],
+                                   retrieveColumnMetadata: Bool) throws -> Cursor {
+        
+        var columns: [ColumnMetadata]? = nil
         
         try performExtendedQueryOperation(
             operation: {
@@ -386,6 +452,31 @@ public class Connection: CustomStringConvertible {
                 
                 try receiveResponse(type: BindCompleteResponse.self)
                 
+                if retrieveColumnMetadata {
+                    
+                    let describePortalRequest = DescribePortalRequest()
+                    try sendRequest(describePortalRequest, buffer: true)
+                    
+                    try sendRequest(flushRequest)
+                    
+                    let response = try receiveResponse()
+                    
+                    switch response {
+                        
+                    case is NoDataResponse:
+                        columns = nil
+                        
+                    case let rowDescriptionResponse as RowDescriptionResponse:
+                        columns = rowDescriptionResponse.columns
+                        
+                    default:
+                        log(.warning, "Unexpected response type: \(response.responseType)")
+                        
+                        throw PostgresError.serverError(
+                            description: "unexpected response type '\(response.responseType)'")
+                    }
+                }
+                
                 let executeRequest = ExecuteRequest(statement: statement)
                 try sendRequest(executeRequest, buffer: true)
                 
@@ -398,16 +489,24 @@ public class Connection: CustomStringConvertible {
             }
         )
             
-        let cursor = Cursor(statement: statement)
+        let cursor = Cursor(statement: statement, columns: columns)
+        
+        // Because RowDecoder computes some derived state from the column metadata, we re-use the
+        // same RowDecoder instance for all rows in a cursor in order to amortize this cost.
+        let columnNameRowDecoder = (columns == nil) ? nil : RowDecoder(columns: columns)
         
         // (The CursorState enum cases capture the Cursor id, rather than the Cursor instance, to
         // avoid a reference cycle.)
-        cursorState = .open(cursorId: cursor.id, bufferedRow: nil)
+        cursorState = .open(cursorId: cursor.id,
+                            columnNameRowDecoder: columnNameRowDecoder,
+                            bufferedRow: nil)
         
         // Retrieve and buffer the first row of the cursor, if any.  We do this to check whether
         // the execution failed, so we can throw an error from this method.
         if let firstRow = try nextRowOfCursor(cursor) {
-            cursorState = .open(cursorId: cursor.id, bufferedRow: firstRow)
+            cursorState = .open(cursorId: cursor.id,
+                                columnNameRowDecoder: columnNameRowDecoder,
+                                bufferedRow: firstRow)
         }
         
         return cursor
@@ -456,7 +555,7 @@ public class Connection: CustomStringConvertible {
     /// Between when it is created and when it is closed, a connection can perform a sequence of
     /// SQL statements.  Each statement is performed by an exchange between PostgresClientKit and
     /// the Postgres server of "extended query" requests and responses.  For more information, see
-    /// https://www.postgresql.org/docs/11/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY.
+    /// https://www.postgresql.org/docs/12/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY.
     ///
     /// A SQL statement can return a result consisting of a one or more rows.  Instead of exposing
     /// this result as an array of rows, PostgresClientKit exposes an iterator by which the next
@@ -473,7 +572,7 @@ public class Connection: CustomStringConvertible {
         case closed
         
         /// There is a currently open cursor, with an optional buffered row.
-        case open(cursorId: String, bufferedRow: Row?)
+        case open(cursorId: String, columnNameRowDecoder: RowDecoder?, bufferedRow: Row?)
         
         /// There is a currently open cursor, but all rows have been retrieved.
         case drained(cursorId: String)
@@ -560,7 +659,9 @@ public class Connection: CustomStringConvertible {
         case .drained:
             row = nil
             
-        case let .open(cursorId: cursorId, bufferedRow: bufferedRow):
+        case let .open(cursorId: cursorId,
+                       columnNameRowDecoder: columnNameRowDecoder,
+                       bufferedRow: bufferedRow):
             
             do {
                 // Do we have a row buffered?
@@ -568,7 +669,9 @@ public class Connection: CustomStringConvertible {
                     
                     // Yes, so return it.
                     row = bufferedRow
-                    cursorState = .open(cursorId: cursorId, bufferedRow: nil)
+                    cursorState = .open(cursorId: cursorId,
+                                        columnNameRowDecoder: columnNameRowDecoder,
+                                        bufferedRow: nil)
                     
                 } else {
                     
@@ -599,7 +702,8 @@ public class Connection: CustomStringConvertible {
                         cursorState = .drained(cursorId: cursorId)
 
                     case let dataRowResponse as DataRowResponse:
-                        row = Row(columns: dataRowResponse.columns)
+                        row = Row(columns: dataRowResponse.columns,
+                                  columnNameRowDecoder: columnNameRowDecoder)
                         
                     default:
                         log(.warning, "Unexpected response: \(response)")
@@ -651,7 +755,7 @@ public class Connection: CustomStringConvertible {
         case .closed:
             return true
             
-        case let .open(cursorId: cursorId, bufferedRow: _):
+        case let .open(cursorId: cursorId, columnNameRowDecoder: _, bufferedRow: _):
             return cursorId != cursor.id
             
         case let .drained(cursorId: cursorId):
@@ -779,8 +883,10 @@ public class Connection: CustomStringConvertible {
             case "N": response = try NoticeResponse(responseBody: responseBody)
             case "R": response = try AuthenticationResponse.parse(responseBody: responseBody)
             case "S": response = try ParameterStatusResponse(responseBody: responseBody)
+            case "T": response = try RowDescriptionResponse(responseBody: responseBody)
             case "Z": response = try ReadyForQueryResponse(responseBody: responseBody)
-                
+            case "n": response = try NoDataResponse(responseBody: responseBody)
+
             default:
                 log(.warning, "Unrecognized response type: \(responseType)")
                 
@@ -865,7 +971,7 @@ public class Connection: CustomStringConvertible {
         }
         
         internal let responseType: Character
-        private var bytesRemaining: Int
+        internal private(set) var bytesRemaining: Int
         internal let connection: Connection
         
         /// Reads an unsigned 8-bit integer without consuming it.
@@ -1125,6 +1231,12 @@ public class Connection: CustomStringConvertible {
         return c
     }
     
+    private func verifyReadBufferFullyConsumed() throws {
+        guard readBufferPosition == readBuffer.count else {
+            throw PostgresError.serverError(description: "response too long")
+        }
+    }
+    
     private func refillReadBuffer() throws {
         
         assert(readBufferPosition == readBuffer.count)
@@ -1144,7 +1256,7 @@ public class Connection: CustomStringConvertible {
                 readCount = try socket.read(into: &readBuffer)
                 
                 if readCount == 0 {
-                    // Workaround https://github.com/IBM-Swift/BlueSSLService/issues/79.
+                    // Workaround https://github.com/Kitura/BlueSSLService/issues/79.
                     // This issue results in socket.read(...) returning 0 even though the
                     // socket is supposedly "blocking".
                     Thread.sleep(forTimeInterval: 0.01) // 10 ms

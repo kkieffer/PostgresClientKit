@@ -64,7 +64,9 @@ public class ConsoleLogHandler: LogHandler {
                 .filter { $0.count > 0 }
                 .joined(separator: " ")
             
-            print("[\(prefix)] \(record.message)")
+            // print(...) buffers output, causing log output to not be correctly interleaved with
+            // XCTest output
+            FileHandle.standardOutput.write(("[\(prefix)] \(record.message)\n").data)
         }
     }
     
@@ -73,7 +75,7 @@ public class ConsoleLogHandler: LogHandler {
         let df = DateFormatter()
         df.locale = Postgres.enUsPosixLocale
         df.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
-        df.timeZone = Postgres.utcTimeZone
+        df.timeZone = ISO8601.utcTimeZone
         return df
     }()
 }

@@ -79,37 +79,7 @@ class PostgresClientKitTestCase: XCTestCase {
     //
     // MARK: Connections
     //
-    
-    /// An environment for testing PostgresClientKit.
-    struct TestEnvironment: Codable {
         
-        var postgresHost: String
-        var postgresPort: Int
-        var postgresDatabase: String
-        var terryUsername: String
-        var terryPassword: String
-        var charlieUsername: String
-        var charliePassword: String
-        var maryUsername: String
-        var maryPassword: String
-        
-        static let current: TestEnvironment = {
-            
-            let url = URL(fileURLWithPath: #file)
-                .appendingPathComponent("../TestEnvironment.json")
-                .standardized
-            
-            let environment: TestEnvironment
-
-            do {
-                let data = try Data(contentsOf: url)
-                return try JSONDecoder().decode(TestEnvironment.self, from: data)
-            } catch {
-                fatalError("Error reading TestEnvironment.json: \(error)")
-            }
-        }()
-    }
-    
     /// Creates a `ConnectionConfiguration` for Terry, authenticating by `Credential.trust`.
     ///
     /// - Parameter ssl: whether to use SSL/TLS
@@ -168,7 +138,26 @@ class PostgresClientKitTestCase: XCTestCase {
         return configuration
     }
     
+    /// Creates a `ConnectionConfiguration` for Sally, authenticating by `Credential.scramSHA256`.
+    ///
+    /// - Parameter ssl: whether to use SSL/TLS
+    /// - Returns: the configuration
+    func sallyConnectionConfiguration(ssl: Bool = true) -> ConnectionConfiguration {
+        
+        let environment = TestEnvironment.current
+        
+        var configuration = ConnectionConfiguration()
+        configuration.host = environment.postgresHost
+        configuration.port = environment.postgresPort
+        configuration.ssl = ssl
+        configuration.database = environment.postgresDatabase
+        configuration.user = environment.sallyUsername
+        configuration.credential = .scramSHA256(password: environment.sallyPassword)
+        
+        return configuration
+    }
     
+
     //
     // MARK: Test data
     //
@@ -176,8 +165,8 @@ class PostgresClientKitTestCase: XCTestCase {
     /// Creates (or re-creates) the `weather` table from the Postgres tutorial and populates it
     /// with three rows.
     ///
-    /// - SeeAlso: https://www.postgresql.org/docs/11/tutorial-table.html
-    /// - SeeAlso: https://www.postgresql.org/docs/11/tutorial-populate.html
+    /// - SeeAlso: https://www.postgresql.org/docs/12/tutorial-table.html
+    /// - SeeAlso: https://www.postgresql.org/docs/12/tutorial-populate.html
     func createWeatherTable() throws {
         
         let configuration = terryConnectionConfiguration()

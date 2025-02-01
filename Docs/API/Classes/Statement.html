@@ -56,8 +56,8 @@
 
 <p>Use <code><a href="../Classes/Connection.html#/s:17PostgresClientKit10ConnectionC16prepareStatement4textAA0F0CSS_tKF">Connection.prepareStatement(text:)</a></code> to create a <code>Statement</code>.</p>
 
-<p>Call <code><a href="../Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValuesAA6CursorCSayAA0A16ValueConvertible_pSgG_tKF">Statement.execute(parameterValues:)</a></code> to execute the <code>Statement</code>, specifying the values
-of any parameters.</p>
+<p>Call <code><a href="../Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValues22retrieveColumnMetadataAA6CursorCSayAA0A16ValueConvertible_pSgG_SbtKF">Statement.execute(parameterValues:retrieveColumnMetadata:)</a></code> to execute the <code>Statement</code>,
+specifying the values of any parameters.</p>
 
 <p>A <code>Statement</code> can be repeatedly executed, and the values of its parameters can be different
 each time.</p>
@@ -159,9 +159,9 @@ the Postgres server.  The <code>id</code> is also used in logging and to formula
                   <li class="item">
                     <div>
                       <code>
-                      <a name="/s:17PostgresClientKit9StatementC7execute15parameterValuesAA6CursorCSayAA0A16ValueConvertible_pSgG_tKF"></a>
-                      <a name="//apple_ref/swift/Method/execute(parameterValues:)" class="dashAnchor"></a>
-                      <a class="token" href="#/s:17PostgresClientKit9StatementC7execute15parameterValuesAA6CursorCSayAA0A16ValueConvertible_pSgG_tKF">execute(parameterValues:)</a>
+                      <a name="/s:17PostgresClientKit9StatementC7execute15parameterValues22retrieveColumnMetadataAA6CursorCSayAA0A16ValueConvertible_pSgG_SbtKF"></a>
+                      <a name="//apple_ref/swift/Method/execute(parameterValues:retrieveColumnMetadata:)" class="dashAnchor"></a>
+                      <a class="token" href="#/s:17PostgresClientKit9StatementC7execute15parameterValues22retrieveColumnMetadataAA6CursorCSayAA0A16ValueConvertible_pSgG_SbtKF">execute(parameterValues:retrieveColumnMetadata:)</a>
                       </code>
                     </div>
                     <div class="height-container">
@@ -184,7 +184,8 @@ the Postgres server.  The <code>id</code> is also used in logging and to formula
                           <div class="language">
                             <p class="aside-title">Swift</p>
                             <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="nv">parameterValues</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Protocols/PostgresValueConvertible.html">PostgresValueConvertible</a></span><span class="p">?]</span> <span class="o">=</span> <span class="p">[</span> <span class="p">])</span>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="nv">parameterValues</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Protocols/PostgresValueConvertible.html">PostgresValueConvertible</a></span><span class="p">?]</span> <span class="o">=</span> <span class="p">[</span> <span class="p">],</span>
+                    <span class="nv">retrieveColumnMetadata</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
     <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/Cursor.html">Cursor</a></span></code></pre>
 
                           </div>
@@ -201,9 +202,20 @@ the Postgres server.  The <code>id</code> is also used in logging and to formula
                                 </td>
                                 <td>
                                   <div>
-                                    <p>the values of the statement&rsquo;s parameters.  Index 0 is the
-value of <code>$1</code>, index 1 is the value of <code>$2</code>, and so on.  A <code>nil</code> element represents
-SQL <code>NULL</code>.</p>
+                                    <p>the values of the statement&rsquo;s parameters.  Index 0 is the value of
+<code>$1</code>, index 1 is the value of <code>$2</code>, and so on.  A <code>nil</code> element represents SQL <code>NULL</code>.</p>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <code>
+                                  <em>retrieveColumnMetadata</em>
+                                  </code>
+                                </td>
+                                <td>
+                                  <div>
+                                    <p>whether to retrieve metadata about the columns in the results</p>
                                   </div>
                                 </td>
                               </tr>
@@ -405,6 +417,9 @@ SQL <code>NULL</code>.</p>
               <a href="../Structs.html">Structures</a>
               <ul class="nav-group-tasks">
                 <li class="nav-group-task">
+                  <a href="../Structs/ColumnMetadata.html">ColumnMetadata</a>
+                </li>
+                <li class="nav-group-task">
                   <a href="../Structs/ConnectionConfiguration.html">ConnectionConfiguration</a>
                 </li>
                 <li class="nav-group-task">
@@ -454,7 +469,7 @@ SQL <code>NULL</code>.</p>
       <div class="footer-wrapper">
         <section id="footer">
           <p>Copyright 2019 David Pitfield and the PostgresClientKit contributors. Licensed under the Apache License, Version 2.0.</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </div>
     </div>

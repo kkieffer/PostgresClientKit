@@ -55,7 +55,7 @@
               <p>The result of successfully executing a <code><a href="../Classes/Statement.html">Statement</a></code>.</p>
 <div class="aside aside-note">
     <p class="aside-title">Note</p>
-    Do not confuse this <code>Cursor</code> class with the SQL cursors created by the <a href="https://www.postgresql.org/docs/11/sql-declare.html">SQL DECLARE
+    Do not confuse this <code>Cursor</code> class with the SQL cursors created by the <a href="https://www.postgresql.org/docs/12/sql-declare.html">SQL DECLARE
 command</a>.  The <code>Cursor</code> class exposes
 the result of executing a <em>single</em> SQL command.  A SQL cursor, on other other hand, exposes
 a query&rsquo;s result by <em>repeated</em> execution of the SQL <code>FETCH</code> command.
@@ -71,7 +71,7 @@ automatically closed by its deinitializer.</p>
 Postgres server.</p>
 <div class="aside aside-see-also">
     <p class="aside-title">See also</p>
-    <a href="https://www.postgresql.org/docs/11/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY">Postgres: Message Flow - Extended
+    <a href="https://www.postgresql.org/docs/12/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY">Postgres: Message Flow - Extended
 Query</a>
 
 </div>
@@ -103,6 +103,39 @@ Query</a>
                           <div class="language">
                             <p class="aside-title">Swift</p>
                             <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">id</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </li>
+                  <li class="item">
+                    <div>
+                      <code>
+                      <a name="/s:17PostgresClientKit6CursorC7columnsSayAA14ColumnMetadataVGSgvp"></a>
+                      <a name="//apple_ref/swift/Property/columns" class="dashAnchor"></a>
+                      <a class="token" href="#/s:17PostgresClientKit6CursorC7columnsSayAA14ColumnMetadataVGSgvp">columns</a>
+                      </code>
+                    </div>
+                    <div class="height-container">
+                      <div class="pointer-container"></div>
+                      <section class="section">
+                        <div class="pointer"></div>
+                        <div class="abstract">
+                          <p>Metadata about the columns in the results, or <code>nil</code> if column metadata is not available.</p>
+
+<p>For column metadata to be available, set <code>retrieveColumnMetadata</code> to <code>true</code> in calling
+<code><a href="../Classes/Statement.html#/s:17PostgresClientKit9StatementC7execute15parameterValues22retrieveColumnMetadataAA6CursorCSayAA0A16ValueConvertible_pSgG_SbtKF">Statement.execute(parameterValues:retrieveColumnMetadata:)</a></code>.</p>
+
+<p>Each element in the returned value describes the corresponding element in the <code>columns</code>
+of each <code><a href="../Structs/Row.html">Row</a></code> of the results.</p>
+
+                        </div>
+                        <div class="declaration">
+                          <h4>Declaration</h4>
+                          <div class="language">
+                            <p class="aside-title">Swift</p>
+                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">columns</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Structs/ColumnMetadata.html">ColumnMetadata</a></span><span class="p">]?</span></code></pre>
 
                           </div>
                         </div>
@@ -171,7 +204,7 @@ retrieved (in other words, until <code><a href="../Classes/Cursor.html#/s:17Post
                           <h4>Declaration</h4>
                           <div class="language">
                             <p class="aside-title">Swift</p>
-                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">internal(set)</span> <span class="k">var</span> <span class="nv">rowCount</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span></code></pre>
+                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">internal(set)</span> <span class="k">var</span> <span class="nv">rowCount</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
 
                           </div>
                         </div>
@@ -415,6 +448,9 @@ an associated <code>Error</code>); or <code>nil</code> if there are no more rows
               <a href="../Structs.html">Structures</a>
               <ul class="nav-group-tasks">
                 <li class="nav-group-task">
+                  <a href="../Structs/ColumnMetadata.html">ColumnMetadata</a>
+                </li>
+                <li class="nav-group-task">
                   <a href="../Structs/ConnectionConfiguration.html">ConnectionConfiguration</a>
                 </li>
                 <li class="nav-group-task">
@@ -464,7 +500,7 @@ an associated <code>Error</code>); or <code>nil</code> if there are no more rows
       <div class="footer-wrapper">
         <section id="footer">
           <p>Copyright 2019 David Pitfield and the PostgresClientKit contributors. Licensed under the Apache License, Version 2.0.</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </div>
     </div>

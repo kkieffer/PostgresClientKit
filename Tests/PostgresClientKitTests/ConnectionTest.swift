@@ -66,6 +66,15 @@ class ConnectionTest: PostgresClientKitTestCase {
             }
         }
 
+        // Authenticate: trust required, scramSHA256 supplied
+        configuration = terryConnectionConfiguration()
+        configuration.credential = .scramSHA256(password: "wrong-credential-type")
+        XCTAssertThrowsError(try Connection(configuration: configuration)) { error in
+            guard case PostgresError.trustCredentialRequired = error else {
+                return XCTFail(String(describing: error))
+            }
+        }
+
         // Authenticate: cleartextPassword required, trust supplied
         configuration = charlieConnectionConfiguration()
         configuration.credential = .trust
@@ -91,6 +100,15 @@ class ConnectionTest: PostgresClientKitTestCase {
         // Authenticate: cleartextPassword required, md5Password supplied
         configuration = charlieConnectionConfiguration()
         configuration.credential = .md5Password(password: "wrong-credential-type")
+        XCTAssertThrowsError(try Connection(configuration: configuration)) { error in
+            guard case PostgresError.cleartextPasswordCredentialRequired = error else {
+                return XCTFail(String(describing: error))
+            }
+        }
+        
+        // Authenticate: cleartextPassword required, scramSHA256 supplied
+        configuration = charlieConnectionConfiguration()
+        configuration.credential = .scramSHA256(password: "wrong-credential-type")
         XCTAssertThrowsError(try Connection(configuration: configuration)) { error in
             guard case PostgresError.cleartextPasswordCredentialRequired = error else {
                 return XCTFail(String(describing: error))
@@ -126,6 +144,76 @@ class ConnectionTest: PostgresClientKitTestCase {
             guard case PostgresError.sqlError = error else {
                 return XCTFail(String(describing: error))
             }
+        }
+        
+        // Authenticate: md5Password required, scramSHA256 supplied
+        configuration = maryConnectionConfiguration()
+        configuration.credential = .scramSHA256(password: "wrong-credential-type")
+        XCTAssertThrowsError(try Connection(configuration: configuration)) { error in
+            guard case PostgresError.md5PasswordCredentialRequired = error else {
+                return XCTFail(String(describing: error))
+            }
+        }
+
+        // Authenticate: scramSHA256 required, trust supplied
+        configuration = sallyConnectionConfiguration()
+        configuration.credential = .trust
+        XCTAssertThrowsError(try Connection(configuration: configuration)) { error in
+            guard case PostgresError.scramSHA256CredentialRequired = error else {
+                return XCTFail(String(describing: error))
+            }
+        }
+
+        // Authenticate: scramSHA256 required, cleartextPassword supplied
+        configuration = sallyConnectionConfiguration()
+        configuration.credential = .cleartextPassword(password: "wrong-credential-type")
+        XCTAssertThrowsError(try Connection(configuration: configuration)) { error in
+            guard case PostgresError.scramSHA256CredentialRequired = error else {
+                return XCTFail(String(describing: error))
+            }
+        }
+        
+        // Authenticate: scramSHA256 required, md5Password supplied
+        configuration = sallyConnectionConfiguration()
+        configuration.credential = .md5Password(password: "wrong-credential-type")
+        XCTAssertThrowsError(try Connection(configuration: configuration)) { error in
+            guard case PostgresError.scramSHA256CredentialRequired = error else {
+                return XCTFail(String(describing: error))
+            }
+        }
+        
+        // Authenticate: scramSHA256 required, scramSHA256 supplied
+        configuration = sallyConnectionConfiguration()
+        XCTAssertNoThrow(try Connection(configuration: configuration).close())
+
+        // Authenticate: scramSHA256 required, scramSHA256 supplied, incorrect password
+        configuration = sallyConnectionConfiguration()
+        configuration.credential = .scramSHA256(password: "wrong-password")
+        XCTAssertThrowsError(try Connection(configuration: configuration)) { error in
+            guard case PostgresError.sqlError = error else {
+                return XCTFail(String(describing: error))
+            }
+        }
+    }
+    
+    func testApplicationName() {
+        
+        do {
+            let applicationName = "Test-\(Int.random(in: Int.min...Int.max))"
+            
+            var configuration = terryConnectionConfiguration()
+            configuration.applicationName = applicationName 
+            
+            let connection = try Connection(configuration: configuration)
+            
+            let text = "SELECT COUNT(*) FROM pg_stat_activity WHERE application_name = $1"
+            let statement = try connection.prepareStatement(text: text)
+            let cursor = try statement.execute(parameterValues: [ applicationName ])
+            let firstRow = try cursor.next()!.get()
+            let count = try firstRow.columns[0].int()
+            XCTAssertEqual(count, 1)
+        } catch {
+            XCTFail(String(describing: error))
         }
     }
     

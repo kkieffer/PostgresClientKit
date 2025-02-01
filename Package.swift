@@ -10,7 +10,7 @@ let package = Package(
             targets: ["PostgresClientKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/IBM-Swift/BlueSocket.git", from: "1.0.0"),
+        .package(url: "https://github.com/Kitura/BlueSocket.git", from: "2.0.0"),
         .package(url: "https://github.com/kkieffer/BlueSSLService.git", .branch("master"))
     ],
     targets: [

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ColumnMetadata Structure Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+	<meta name="viewport" content="width=device-width, viewport-fit=cover, initial-scale=1.0" />
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Struct/ColumnMetadata" class="dashAnchor"></a>
+    <a title="ColumnMetadata Structure Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p>
+          <a href="../index.html">PostgresClientKit Docs</a>
+          <span class="no-mobile"> (100% documented)</span>
+        </p>
+    
+        <p class="header-right">
+          <a href="https://github.com/codewinsdotcom/PostgresClientKit">
+            <img src="../img/gh.png"/>
+            <span class="no-mobile">View on GitHub</span>
+          </a>
+        </p>
+    
+      </div>
+    </header>
+    <div id="breadcrumbs-container">
+      <div class="content-wrapper">
+        <p id="breadcrumbs">
+          <span class="no-mobile">
+            <a href="../index.html">PostgresClientKit Reference</a>
+            <img id="carat" src="../img/carat.png" />
+          </span>
+          ColumnMetadata Structure Reference
+        </p>
+      </div>
+    </div>
+    <div class="wrapper">
+      <div class="article-wrapper">
+        <article class="main-content">
+          <section>
+            <section class="section">
+              <h1>ColumnMetadata</h1>
+                <div class="declaration">
+                  <div class="language">
+                    <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ColumnMetadata</span></code></pre>
+
+                  </div>
+                </div>
+              <p>Metadata about a column in the results of executing a <code><a href="../Classes/Statement.html">Statement</a></code>.</p>
+
+            </section>
+            <section class="section task-group-section">
+              <div class="task-group">
+                <ul>
+                  <li class="item">
+                    <div>
+                      <code>
+                      <a name="/s:17PostgresClientKit14ColumnMetadataV4nameSSvp"></a>
+                      <a name="//apple_ref/swift/Property/name" class="dashAnchor"></a>
+                      <a class="token" href="#/s:17PostgresClientKit14ColumnMetadataV4nameSSvp">name</a>
+                      </code>
+                    </div>
+                    <div class="height-container">
+                      <div class="pointer-container"></div>
+                      <section class="section">
+                        <div class="pointer"></div>
+                        <div class="abstract">
+                          <p>The name of the column.</p>
+
+                        </div>
+                        <div class="declaration">
+                          <h4>Declaration</h4>
+                          <div class="language">
+                            <p class="aside-title">Swift</p>
+                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </li>
+                  <li class="item">
+                    <div>
+                      <code>
+                      <a name="/s:17PostgresClientKit14ColumnMetadataV8tableOIDs6UInt32Vvp"></a>
+                      <a name="//apple_ref/swift/Property/tableOID" class="dashAnchor"></a>
+                      <a class="token" href="#/s:17PostgresClientKit14ColumnMetadataV8tableOIDs6UInt32Vvp">tableOID</a>
+                      </code>
+                    </div>
+                    <div class="height-container">
+                      <div class="pointer-container"></div>
+                      <section class="section">
+                        <div class="pointer"></div>
+                        <div class="abstract">
+                          <p>If the column can be identified as a column of a specific table, the object ID of that
+table; otherwise zero.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <a href="https://www.postgresql.org/docs/12/catalog-pg-attribute.html">pg_attribute.attrelid</a>
+
+</div>
+
+                        </div>
+                        <div class="declaration">
+                          <h4>Declaration</h4>
+                          <div class="language">
+                            <p class="aside-title">Swift</p>
+                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">tableOID</span><span class="p">:</span> <span class="kt">UInt32</span></code></pre>
+
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </li>
+                  <li class="item">
+                    <div>
+                      <code>
+                      <a name="/s:17PostgresClientKit14ColumnMetadataV21columnAttributeNumberSivp"></a>
+                      <a name="//apple_ref/swift/Property/columnAttributeNumber" class="dashAnchor"></a>
+                      <a class="token" href="#/s:17PostgresClientKit14ColumnMetadataV21columnAttributeNumberSivp">columnAttributeNumber</a>
+                      </code>
+                    </div>
+                    <div class="height-container">
+                      <div class="pointer-container"></div>
+                      <section class="section">
+                        <div class="pointer"></div>
+                        <div class="abstract">
+                          <p>If the column can be identified as a column of a specific table, the attribute number of
+the column in that table; otherwise zero.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <a href="https://www.postgresql.org/docs/12/catalog-pg-attribute.html">pg_attribute.attnum</a>
+
+</div>
+
+                        </div>
+                        <div class="declaration">
+                          <h4>Declaration</h4>
+                          <div class="language">
+                            <p class="aside-title">Swift</p>
+                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">columnAttributeNumber</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </li>
+                  <li class="item">
+                    <div>
+                      <code>
+                      <a name="/s:17PostgresClientKit14ColumnMetadataV11dataTypeOIDs6UInt32Vvp"></a>
+                      <a name="//apple_ref/swift/Property/dataTypeOID" class="dashAnchor"></a>
+                      <a class="token" href="#/s:17PostgresClientKit14ColumnMetadataV11dataTypeOIDs6UInt32Vvp">dataTypeOID</a>
+                      </code>
+                    </div>
+                    <div class="height-container">
+                      <div class="pointer-container"></div>
+                      <section class="section">
+                        <div class="pointer"></div>
+                        <div class="abstract">
+                          <p>The object ID of the column&rsquo;s data type.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <a href="https://www.postgresql.org/docs/12/catalog-pg-type.html">pg_type.oid</a>
+
+</div>
+
+                        </div>
+                        <div class="declaration">
+                          <h4>Declaration</h4>
+                          <div class="language">
+                            <p class="aside-title">Swift</p>
+                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">dataTypeOID</span><span class="p">:</span> <span class="kt">UInt32</span></code></pre>
+
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </li>
+                  <li class="item">
+                    <div>
+                      <code>
+                      <a name="/s:17PostgresClientKit14ColumnMetadataV12dataTypeSizeSivp"></a>
+                      <a name="//apple_ref/swift/Property/dataTypeSize" class="dashAnchor"></a>
+                      <a class="token" href="#/s:17PostgresClientKit14ColumnMetadataV12dataTypeSizeSivp">dataTypeSize</a>
+                      </code>
+                    </div>
+                    <div class="height-container">
+                      <div class="pointer-container"></div>
+                      <section class="section">
+                        <div class="pointer"></div>
+                        <div class="abstract">
+                          <p>The data type size.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <a href="https://www.postgresql.org/docs/12/catalog-pg-type.html">pg_type.typlen</a>
+
+</div>
+
+                        </div>
+                        <div class="declaration">
+                          <h4>Declaration</h4>
+                          <div class="language">
+                            <p class="aside-title">Swift</p>
+                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">dataTypeSize</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </li>
+                  <li class="item">
+                    <div>
+                      <code>
+                      <a name="/s:17PostgresClientKit14ColumnMetadataV16dataTypeModifiers6UInt32Vvp"></a>
+                      <a name="//apple_ref/swift/Property/dataTypeModifier" class="dashAnchor"></a>
+                      <a class="token" href="#/s:17PostgresClientKit14ColumnMetadataV16dataTypeModifiers6UInt32Vvp">dataTypeModifier</a>
+                      </code>
+                    </div>
+                    <div class="height-container">
+                      <div class="pointer-container"></div>
+                      <section class="section">
+                        <div class="pointer"></div>
+                        <div class="abstract">
+                          <p>The data type modifier.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <a href="https://www.postgresql.org/docs/12/catalog-pg-attribute.html">pg_attribute.atttypmod</a>
+
+</div>
+
+                        </div>
+                        <div class="declaration">
+                          <h4>Declaration</h4>
+                          <div class="language">
+                            <p class="aside-title">Swift</p>
+                            <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">dataTypeModifier</span><span class="p">:</span> <span class="kt">UInt32</span></code></pre>
+
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </section>
+        </article>
+      </div>
+      <div class="nav-wrapper">
+        <nav class="nav-bottom">
+          <ul class="nav-groups">
+            <li class="nav-group-name">
+              <a href="../Classes.html">Classes</a>
+              <ul class="nav-group-tasks">
+                <li class="nav-group-task">
+                  <a href="../Classes/Connection.html">Connection</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Classes/ConnectionPool.html">ConnectionPool</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Classes/ConsoleLogHandler.html">ConsoleLogHandler</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Classes/Cursor.html">Cursor</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Classes/Logger.html">Logger</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Classes/Statement.html">Statement</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-group-name">
+              <a href="../Enums.html">Enumerations</a>
+              <ul class="nav-group-tasks">
+                <li class="nav-group-task">
+                  <a href="../Enums/Credential.html">Credential</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Enums/LogLevel.html">LogLevel</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Enums/PostgresError.html">PostgresError</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-group-name">
+              <a href="../Extensions.html">Extensions</a>
+              <ul class="nav-group-tasks">
+                <li class="nav-group-task">
+                  <a href="../Extensions/Bool.html">Bool</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Extensions/Date.html">Date</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Extensions/Decimal.html">Decimal</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Extensions/Double.html">Double</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Extensions/Int.html">Int</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Extensions/Optional.html">Optional</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Extensions/String.html">String</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-group-name">
+              <a href="../Protocols.html">Protocols</a>
+              <ul class="nav-group-tasks">
+                <li class="nav-group-task">
+                  <a href="../Protocols/ConnectionDelegate.html">ConnectionDelegate</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Protocols/LogHandler.html">LogHandler</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Protocols/PostgresValueConvertible.html">PostgresValueConvertible</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-group-name">
+              <a href="../Structs.html">Structures</a>
+              <ul class="nav-group-tasks">
+                <li class="nav-group-task">
+                  <a href="../Structs/ColumnMetadata.html">ColumnMetadata</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/ConnectionConfiguration.html">ConnectionConfiguration</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/ConnectionPoolConfiguration.html">ConnectionPoolConfiguration</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/ConnectionPoolMetrics.html">ConnectionPoolMetrics</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/LogRecord.html">LogRecord</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/Notice.html">Notice</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/Postgres.html">Postgres</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/PostgresByteA.html">PostgresByteA</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/PostgresDate.html">PostgresDate</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/PostgresTime.html">PostgresTime</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/PostgresTimeWithTimeZone.html">PostgresTimeWithTimeZone</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/PostgresTimestamp.html">PostgresTimestamp</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/PostgresTimestampWithTimeZone.html">PostgresTimestampWithTimeZone</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/PostgresValue.html">PostgresValue</a>
+                </li>
+                <li class="nav-group-task">
+                  <a href="../Structs/Row.html">Row</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-wrapper">
+        <section id="footer">
+          <p>Copyright 2019 David Pitfield and the PostgresClientKit contributors. Licensed under the Apache License, Version 2.0.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </div>
+    </div>
+  </body>
+</div>
+</html>

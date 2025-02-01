@@ -46,7 +46,7 @@ do {
     configuration.host = "127.0.0.1"
     configuration.database = "example"
     configuration.user = "bob"
-    configuration.credential = .md5Password(password: "welcome1")
+    configuration.credential = .scramSHA256(password: "welcome1")
 
     let connection = try PostgresClientKit.Connection(configuration: configuration)
     defer { connection.close() }
@@ -86,14 +86,14 @@ San Francisco on 1994-11-29: low: 43, high: 57, precipitation: Optional(0.0)
 ## Prerequisites
 
 - **Swift 5 or later**  (PostgresClientKit uses Swift 5 language features)
-- **`libssl-dev`** (only required on Linux, and only for SSL/TLS connections)
+- **`libssl-dev`** (only required on Linux)
 
 PostgresClientKit is compatible with Linux, macOS, and iOS.  It has been tested on:
 
-- Ubuntu 18.04 LTS 
-- macOS 10.14
-- iOS 12, 13
-- Postgres 10, 11, 12
+- Ubuntu 18.04 LTS, 20.04 LTS
+- macOS 10.14, 10.15, 11, 12
+- iOS 12, 13, 14, 15
+- Postgres 10, 11, 12, 13, 14
 
 ## Building
 
@@ -118,7 +118,25 @@ swift test
 
 ## Using
 
-### Swift Package Manager
+### From an Xcode project (as a package dependency)
+
+In Xcode:
+
+- Select File > Add Packages...
+
+- Enter the package URL: `https://github.com/codewinsdotcom/PostgresClientKit`
+
+- Set the package version requirements (see [Decide on Package Requirements](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app)).  For example, choose `Up To Next Major Version` and `1.0.0` to select the latest 1.x.x release of PostgresClientKit.
+
+- Click Add Package.
+
+Import to your source code file:
+
+```swift
+import PostgresClientKit
+```
+
+### From a standalone Swift package (`Package.swift`)
 
 In your `Package.swift` file:
 
@@ -146,7 +164,7 @@ Import to your source code file:
 import PostgresClientKit
 ```
 
-### CocoaPods
+### Using CocoaPods
 
 Add `PostgresClientKit` to your `Podfile`.  For example:
 
@@ -200,8 +218,8 @@ PostgresClientKit uses [Semantic Versioning 2.0.0](https://semver.org).  For the
 
 ## Built with
 
-- [Kitura BlueSocket](https://github.com/IBM-Swift/BlueSocket) - socket library
-- [Kitura BlueSSLService](https://github.com/IBM-Swift/BlueSSLService) - SSL/TLS support
+- [Kitura BlueSocket](https://github.com/Kitura/BlueSocket) - socket library
+- [Kitura BlueSSLService](https://github.com/Kitura/BlueSSLService) - SSL/TLS support
 - [Jazzy](https://github.com/realm/jazzy) - generation of API documentation pages
 
 ## Authors
