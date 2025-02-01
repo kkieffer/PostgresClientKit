@@ -183,7 +183,9 @@ public class Connection: CustomStringConvertible {
                 
             case is AuthenticationCleartextPasswordResponse:
                 
-                guard case let .cleartextPassword(password) = configuration.credential else {
+                let credential = configuration.password != nil ? .cleartextPassword(password: configuration.password!) : configuration.credential
+
+                guard case let .cleartextPassword(password) = credential else {
                     log(.warning, "Cleartext password credential required to authenticate")
                     throw PostgresError.cleartextPasswordCredentialRequired
                 }
@@ -194,7 +196,9 @@ public class Connection: CustomStringConvertible {
                 
             case let response as AuthenticationMD5PasswordResponse:
                 
-                guard case let .md5Password(password) = configuration.credential else {
+                let credential = configuration.password != nil ? .md5Password(password: configuration.password!) : configuration.credential
+    
+                guard case let .md5Password(password) = credential else {
                     log(.warning, "MD5 password credential required to authenticate")
                     throw PostgresError.md5PasswordCredentialRequired
                 }
@@ -214,7 +218,9 @@ public class Connection: CustomStringConvertible {
 
             case let response as AuthenticationSASLResponse:
                 
-                guard case let .scramSHA256(password) = configuration.credential else {
+                let credential = configuration.password != nil ? .scramSHA256(password: configuration.password!) : configuration.credential
+                
+                guard case let .scramSHA256(password) = credential else {
                     log(.warning, "SCRAM-SHA-256 credential required to authenticate")
                     throw PostgresError.scramSHA256CredentialRequired
                 }

@@ -61,6 +61,9 @@ public struct ConnectionConfiguration {
     /// `Credential.trust`.
     public var credential = Credential.trust
     
+    /// Password - if this is set then we use this password hashed by the Credential that the server sends back instead of using credential
+    public var password : String?
+    
     /// The Postgres `application_name` parameter.  Included in the `pg_stat_activity` view and
     /// displayed by pgAdmin.  Defaults to `PostgresClientKit`.
     public var applicationName = "PostgresClientKit"
